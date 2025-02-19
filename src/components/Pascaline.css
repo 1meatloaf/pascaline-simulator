@@ -1,0 +1,41 @@
+.pascaline-container {
+    background-color: #e6ce1d;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0  0 10px rgba(0, 0, 0, 0, 1);
+    text-align: center;
+}
+
+.display {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+input[type="number"] {
+    padding: 10px;
+    font-size: 16;
+    width: 100px;
+    border: 1px solid #e7db71;
+    border-radius: 5px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #828055;
+    color: #d7d244;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    border-color: #858900;
+  }

@@ -41,6 +41,43 @@ const Pascaline = () => {
     setDigits(newDigits);
   };
 
+  // Fungsi mengalikan angka 
+  const multiplyNumber = (number) => {
+    const multiplier = parseInt(document.getElementById('inputNumber').value, 10);
+    if (isNaN(multiplier) || multiplier < 0) return;
+
+    let result = 0;
+    for (let i = 0; i < multiplier; i++){
+        result += number;
+    }
+    setDigits(convertToDigits(result));
+  };
+
+  // Fungsi untuk membagi angka
+  const divideNumber = (number) => {
+    const divisor = parseInt(document.getElementById('inputNumber').value, 10);
+    if (isNaN(divisor) || divisor <= 0) return;
+
+    let result = 0;
+    let temp = number;
+    while (temp >= divisor){
+        temp -= divisor;
+        result++;
+    }
+    setDigits(convertToDigits(result));
+  };
+
+  // Fungsi konversi angka menjadi array digit
+  const convertToDigits = (number) => {
+    const digits = [0, 0, 0, 0];
+    let temp = number;
+    for (let i = digits.length - 1; i >= 0; i--) {
+        digits[i] = temp % 10;
+        temp = Math.floor(temp / 10);
+    }
+    return digits;
+  };    
+
   // Fungsi untuk mereset semua digit ke 0
   const reset = () => {
     setDigits([0, 0, 0, 0]);

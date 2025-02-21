@@ -9,8 +9,11 @@
 .display {
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 140px;
+    gap: 70px;
+    /* margin-top: 60px; */
 }
+
 
 .controls {
     display: flex;

@@ -1,0 +1,17 @@
+.digit-wheel {
+    width: 50px;
+    height: 50;
+    background-color: #878787;
+    color: #c9ae40;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    margin: 0 5px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.digit-wheel:hover {
+    background-color: #444;
+}

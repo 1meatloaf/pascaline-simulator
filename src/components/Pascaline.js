@@ -3,11 +3,11 @@ import Digit from './Digit';
 import './Pascaline.css';
 
 const Pascaline = () => {
-  const [digits, setDigits] = useState([0, 0, 0, 0, 0]); // State untuk menyimpan digit
+  const [digits, setDigits] = useState([0, 0, 0, 0]); // State untuk menyimpan digit
 
     // Fungsi konversi angka menjadi array digit
     const convertToDigits = (number) => {
-        const digits = [0, 0, 0, 0, 0];
+        const digits = [0, 0, 0, 0];
         let temp = number;
         for (let i = digits.length - 1; i >= 0; i--) {
             digits[i] = temp % 10;
@@ -76,8 +76,26 @@ const Pascaline = () => {
 
   // Fungsi untuk mereset semua digit ke 0
   const reset = () => {
-    setDigits([0, 0, 0, 0, 0]);
+    setDigits([0, 0, 0, 0]);
   };
+
+  const Digitwheel = () => {
+    const [digits, setDigits] = useState ([0, 0, 0, 0]);
+
+    const updateDigit = (index, newValue) => {
+        const newDigits = [...digits];
+        newDigits[index] = newValue;
+        setDigits[newDigits];
+    };
+
+    const addNumber = (number) => {
+        let carry = 0;
+        const newDigits = [...digits];
+        for (let 1 = newDigits.length - 1; i >= 0; i--) {
+            let sum = newDigits[i] * (number % 10) + carry;
+        }
+    }
+};
 
   return (
     <div className="pascaline-container">

@@ -3,7 +3,18 @@ import Digit from './Digit';
 import './Pascaline.css';
 
 const Pascaline = () => {
-  const [digits, setDigits] = useState([0, 0, 0, 0]); // State untuk menyimpan digit
+  const [digits, setDigits] = useState([0, 0, 0, 0, 0]); // State untuk menyimpan digit
+
+    // Fungsi konversi angka menjadi array digit
+    const convertToDigits = (number) => {
+        const digits = [0, 0, 0, 0, 0];
+        let temp = number;
+        for (let i = digits.length - 1; i >= 0; i--) {
+            digits[i] = temp % 10;
+            temp = Math.floor(temp / 10);
+        }
+        return digits;
+      };    
 
   // Fungsi untuk menambahkan angka
   const addNumber = (number) => {
@@ -42,45 +53,30 @@ const Pascaline = () => {
   };
 
   // Fungsi mengalikan angka 
-  const multiplyNumber = (number) => {
+  const multiplyNumber = () => {
     const multiplier = parseInt(document.getElementById('inputNumber').value, 10);
     if (isNaN(multiplier) || multiplier < 0) return;
 
-    let result = 0;
-    for (let i = 0; i < multiplier; i++){
-        result += number;
-    }
+    const currentNumber = parseInt(digits.join(''),10);
+    const result = Math.floor(currentNumber / multiplier);
+
     setDigits(convertToDigits(result));
   };
 
   // Fungsi untuk membagi angka
-  const divideNumber = (number) => {
+  const divideNumber = () => {
     const divisor = parseInt(document.getElementById('inputNumber').value, 10);
     if (isNaN(divisor) || divisor <= 0) return;
 
-    let result = 0;
-    let temp = number;
-    while (temp >= divisor){
-        temp -= divisor;
-        result++;
-    }
+    const currentNumber = parseInt(digits.join(''), 10);
+    const result = Math.floor(currentNumber / divisor);
+
     setDigits(convertToDigits(result));
   };
 
-  // Fungsi konversi angka menjadi array digit
-  const convertToDigits = (number) => {
-    const digits = [0, 0, 0, 0];
-    let temp = number;
-    for (let i = digits.length - 1; i >= 0; i--) {
-        digits[i] = temp % 10;
-        temp = Math.floor(temp / 10);
-    }
-    return digits;
-  };    
-
   // Fungsi untuk mereset semua digit ke 0
   const reset = () => {
-    setDigits([0, 0, 0, 0]);
+    setDigits([0, 0, 0, 0, 0]);
   };
 
   return (
@@ -103,6 +99,12 @@ const Pascaline = () => {
         </button>
         <button onClick={() => subtractNumber(parseInt(document.getElementById('inputNumber').value, 10))}>
           Kurangi
+        </button>
+        <button onClick={() => multiplyNumber(parseInt(document.getElementById('inputNumber').value, 10))}>
+          Kali
+        </button>
+        <button onClick={() => divideNumber(parseInt(document.getElementById('inputNumber').value, 10))}>
+          Bagi  
         </button>
         <button onClick={reset}>Reset</button>
       </div>

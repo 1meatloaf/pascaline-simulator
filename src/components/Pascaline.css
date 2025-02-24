@@ -11,11 +11,11 @@
     justify-content: center;
     margin-bottom: 140px;
     gap: 70px;
-    /* margin-top: 60px; */
+    margin-bottom: 20px;
 }
 
 
-.controls {
+/* .controls {
     display: flex;
     justify-content: center;
     gap: 10px;
@@ -41,4 +41,4 @@ input[type="number"] {
   
   button:hover {
     border-color: #858900;
-  }
+  } */

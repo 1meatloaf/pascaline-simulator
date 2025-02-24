@@ -1,17 +1,37 @@
 .digit-wheel {
-    width: 50px;
-    height: 50;
-    background-color: #878787;
-    color: #c9ae40;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
-    margin: 0 5px;
-    cursor: pointer;
-    user-select: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #333;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.s ease-out; 
 }
 
-.digit-wheel:hover {
-    background-color: #444;
+.digit-number {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  transform-origin: center;
+  transform: rotate(calc(var(--index)* 36deg));
 }
+
+.digit-number:nth-child(1) { --index: 0; }
+.digit-number:nth-child(2) { --index: 1; }
+.digit-number:nth-child(3) { --index: 2; }
+.digit-number:nth-child(4) { --index: 3; }
+.digit-number:nth-child(5) { --index: 4; }
+.digit-number:nth-child(6) { --index: 5; }
+.digit-number:nth-child(7) { --index: 6; }
+.digit-number:nth-child(8) { --index: 7; }
+.digit-number:nth-child(9) { --index: 8; }
+.digit-number:nth-child(10) { --index: 9; }

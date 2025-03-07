@@ -3,6 +3,22 @@
   padding: 20px;
 }
 
+.mode-indecator {
+  padding: 10px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.mode-indicator.decimal {
+  background-color: #007bff;
+  color: white;
+}
+
+.mode-indecator.hex {
+  background-color: #28a745;
+  color: white;
+}
+
 .mode-switch {
   margin-bottom: 20px;
 }
@@ -15,6 +31,12 @@
 
 .wheel {
   margin: 0 10px;
+  transition: transform 0.5s;
+}
+
+.wheel:active {
+  transform: scale(1.1);
+  border: 2px solid #007bff;
 }
 
 .decimal-mode, .hex-mode {

@@ -1,56 +1,66 @@
-import React, { useState } from 'react';
+import React, { useActionState, useState } from 'react';
 import Wheel from './components/Wheel';
 import DisplayBar from './components/DisplayBar';
-import Switch from './components/Switch';
+import ModeSwitch from './components/Switch';
 import ColorPreview from './components/ColorPreview';
-// import logo from './logo.svg';
+import OperationsPanel from './components/OperationsPanel';
 import './App.css';
 
 const App = () => {
+  const [mode, setMode] = useState('decimal');
   const [accumulator, setAccumulator] = useState(0);
-  const [isDecimal, setIsDecimal] = useState(true);
-  const [isComplement, setIsComplement] = useState(false); 
   const [wheels, setWheels] = useState([0, 0, 0, 0]);
 
-  const toggleMode = () => setIsDecimal(!isDecimal);
-
-  const updateWheel = (index, delta) => {
-    const newWheels = [...wheels];
-    newWheels[index] = (newWheels[index] + delta +  (isDecimal ? 10 : 16)) %(isDecimal ? 10 : 16);
-    setWheels(newWheels);
-    updateAccumulator(newWheels);
+  const toggleMode = () => {
+    setMode((prevMode) => (prevMode === 'decimal' ? 'hex' : 'decimal'));
+    setAccumulator(0)
+    setWheels([0, 0, 0, 0]);
   };
 
+const updateWheels = (index, delta) => {
+  const newWheels = [...wheels];
+  const base = mode === 'decimal' ? 10 : 16;
+  newWheels[index] = (newWheels[index] + delta + base) % base;
+  setWheels(newWheels);
+  updateAccumulator(newWheels);
+};
+
   const updateAccumulator = (wheels) => {
-    const base = isDecimal ? 10 : 16;
+    const base = mode === 'decimal' ? 10 : 16;
     const value = wheels.reduce((acc, val, idx) => acc + val * Math.pow(base, wheels.length - idx - 1), 0);
     setAccumulator(value);
   };
 
-  const getComplement = (value) => {
-    const base = isDecimal ? 10 : 16;
-    const max = Math.pow(base, wheels.length) - 1;
-    return max - value;
+  const performOperation = (operation) => {
   };
 
   const resetMachine = () => {
-    setWheels([9, 9, 9, 9]);
+    setWheels(mode === 'decimal' ? [9, 9, 9, 9] : [15, 15, 15, 15]);
     setAccumulator(0);
   };
 
   return (
     <div className='App'>
       <h1>Pascaline Calculator</h1>
-      <Switch isDecimal={isDecimal} toggleMode={toggleMode} /> 
+      <ModeSwitch mode = {mode} toggleMode={toggleMode} /> 
       <div className='wheels'>
         {wheels.map((value, index) => (
-          <Wheel key={index} value={value} onChange={(delta) => updateWheel(index, delta)} />
+          <Wheel key={index} value={value} onChange={(delta) => updateWheels(index, delta)} />
         ))}
       </div>
-      <DisplayBar value={isComplement ? getComplement(accumulator) : accumulator} isComplement={isComplement} />
-      <button onClick={() => setIsComplement(!isComplement)}>Toggle Complement</button>
-      <button onClick={resetMachine}>Reset</button>
-      {!isDecimal && <ColorPreview hexValue={accumulator.toString(16).padStart(6, '0')} />}
+      {mode === 'decimal' ? (
+        <div className='decimal-mode'>
+          <div>Decimal Result: {accumulator}</div>
+          <div>Hexadecimal Result: {accumulator.toString(16).toUpperCase()}</div>
+          <ColorPreview hexValue={accumulator.toString(16).padStart(6, '0')} />
+      </div>
+      ) : (
+        <div className='hex-mode'>
+          <div>Hexadecimal Result: {accumulator.toString(16).toUpperCase()}</div>
+          <ColorPreview hexValue={accumulator.toString(16).padStart(6, '0')} />
+        </div>
+      )}
+      <OperationsPanel onOperation={performOperation} onReset = {resetMachine} />
     </div>
   );
 

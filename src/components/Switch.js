@@ -1,13 +1,18 @@
 import React from "react";
 
-const Switch = ({ isDecimsl, toggleMode }) => {
+const ModeSwitch = ({ mode, toggleMode}) => {
     return (
-        <div className="switch">
-            <button onClick={toggleMode}>
-                Switch to {isDecimsl ? 'Hexadecimal' : 'Decimal'}
-            </button>
-        </div>
+      <div className='mode-switch'>
+        <label>
+          <input
+            type='checkbox'
+            checked={mode === 'hex'}
+            onChange={toggleMode}
+          />
+          Switch to {mode === 'decimal' ? 'Hexadecimal' : 'Decimal'}
+        </label>
+      </div>
     );
-};
+  };
 
-export default Switch;
+export default ModeSwitch;

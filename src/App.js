@@ -11,6 +11,7 @@ const App = () => {
   const [accumulator, setAccumulator] = useState(0);
   const [wheels, setWheels] = useState([0, 0, 0, 0]);
   const [activeWheel, setActiveWheel] = useState(null);
+  const [isResetting, setIsResetting] = useState(false);
 
   const toggleMode = () => {
     setMode((prevMode) => (prevMode === 'decimal' ? 'hex' : 'decimal'));
@@ -56,11 +57,27 @@ const App = () => {
     setWheels([0, 0, 0, 0]);
   };
 
+  const resetMachine = () => {
+    setIsResetting(true);
+    const maxValue = mode === 'decimal' ? 9 :15;
+    setWheels([maxValue, maxValue, maxValue, maxValue]);;
+
+    // const wheelsElements = document.querySelector('.wheels');
+    // wheelsElements.classlist.add('reseting');
+
+  setTimeout(() => {
+    setWheels([0, 0, 0, 0]);
+    setAccumulator(0);
+    setIsResetting(false);
+  }, 500);
+
+};
+
   return (
     <div className="App">
       <h1>Pascaline Calculator</h1>
       <ModeSwitch mode={mode} toggleMode={toggleMode} />
-      <div className="wheels">
+      <div className="wheels ${isResetting ? 'resetting' : ''}">
         {wheels.map((value, index) => (
           <Wheel
             key={index}
@@ -71,7 +88,7 @@ const App = () => {
         ))}
       </div>
       <Display value={accumulator} mode={mode} />
-      <OperationsPanel onOperation={performOperation} />
+      <OperationsPanel onOperation={performOperation} onReset={resetMachine}/>
       {mode === 'hex' && <ColorPreview hexValue={accumulator.toString(16).padStart(6, '0')} />}
     </div>
   );

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const OperationsPanel = ({ onOperation }) => {
+const OperationsPanel = ({ onOperation, onReset }) => {
   return (
     <div className="operations-grid">
       <button onClick={() => onOperation('add')}>+</button>
@@ -8,6 +8,7 @@ const OperationsPanel = ({ onOperation }) => {
       <button onClick={() => onOperation('multiply')}>×</button>
       <button onClick={() => onOperation('divide')}>÷</button>
       <button onClick={() => onOperation('equals')}>=</button>
+      <button onClick={onReset}>Reset</button>
     </div>
   );
 };

@@ -27,6 +27,11 @@
   display: flex;
   justify-content: center;
   margin: 20px;
+  transition: opacity 0.5s ease;
+}
+
+.wheels.resseting {
+  opacity: 0,5;
 }
 
 .wheel {

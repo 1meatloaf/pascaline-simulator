@@ -32,6 +32,38 @@ const updateWheels = (index, delta) => {
   };
 
   const performOperation = (operation) => {
+    const base = mode === 'deeimal' ? 10 : 16;
+    let result = accumulator;
+
+    const currentNumber = wheels.reduce((acc, val, idx) => acc + val * Math.pow(base, wheels.length - idx - 1), 0);
+
+    switch (operation) {
+      case 'add':
+          result += currentNumber;
+        break;
+      case 'subtract':
+        const complement = (Math.pow(base, wheels.length) - 1 - currentNumber);
+          result += complement + 1;
+        break;
+      case 'multiply':
+          result *= currentNumber;
+        break;
+      case 'divide':
+        if (currentNumber !== 0) {
+          result /= currentNumber;
+        } else {
+          alert("Cannot divide by zero");
+          return;
+    }
+      break;
+      default:
+      break;
+  };
+
+  result = result % Math.pow(base, wheels.length);
+
+  setAccumulator(result);
+  setWheels(Array(wheels.length).fill(0));
   };
 
   const resetMachine = () => {

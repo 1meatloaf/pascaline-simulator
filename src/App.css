@@ -1,8 +1,41 @@
 .App {
   text-align: center;
+  padding: 20px;
 }
 
-.App-logo {
+.wheels {
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+}
+
+.wheel {
+  margin: 0 10px;
+}
+
+.display-bar {
+  margin: 20px;
+  font-size: 1.5em;
+}
+
+.color-preview {
+  width: 100px;
+  height: 100px;
+  margin: 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: aliceblue;
+  font-weight: bold;
+}
+
+button {
+  margin: 5px;
+  padding: 10px;
+  font-size: 1em;
+}
+
+/* .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
@@ -35,4 +68,4 @@
   to {
     transform: rotate(360deg);
   }
-}
+} */

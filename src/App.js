@@ -11,6 +11,7 @@ const App = () => {
   const [accumulator, setAccumulator] = useState(0);
   const [wheels, setWheels] = useState([0, 0, 0, 0]);
   const [activeWheel, setActiveWheel] = useState(null);
+  const [autoCalculate, setAutoCalculate] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
   const toggleMode = () => {
@@ -19,12 +20,21 @@ const App = () => {
     setWheels([0, 0, 0, 0]);
   };
 
+  const toggleAutoCalculate = () => {
+    setAutoCalculate((prev) => !prev);
+  };
+
   const updateWheel = (index, delta) => {
     const newWheels = [...wheels];
     const base = mode === 'decimal' ? 10 : 16;
     newWheels[index] = (newWheels[index] + delta + base) % base;
     setWheels(newWheels);
     setActiveWheel(index);
+
+    if (autoCalculate) {
+      const currentNumber = newWheels.reduce((acc, val, idx) => acc + val * Math.pow(base, newWheels.length - idx - 1), 0);
+      setAccumulator(currentNumber);
+    }
   };
 
   const performOperation = (operation) => {
@@ -76,7 +86,7 @@ const App = () => {
   return (
     <div className="App">
       <h1>Pascaline Calculator</h1>
-      <ModeSwitch mode={mode} toggleMode={toggleMode} />
+      <ModeSwitch mode={mode} toggleMode={toggleMode} autoCalculate={autoCalculate} toggleAutoCalculate={toggleAutoCalculate}/>
       <div className="wheels ${isResetting ? 'resetting' : ''}">
         {wheels.map((value, index) => (
           <Wheel

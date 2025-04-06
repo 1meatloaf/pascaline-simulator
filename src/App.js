@@ -7,12 +7,12 @@ const Game = () => {
   const [wheels, setWheels] = useState([0, 0, 0, 0]);
   const [guesses, setGuesses] = useState([]); 
   const [multiplier, setMultiplier] = useState(3.0);
-  const [timeleft, setTimeLeft] = useState(180);
+  const [timeLeft, setTimeLeft] = useState(180);
   const [level, setLevel] = useState(1);
 
 
   const currentHex  = () => {
-    const hex = Math.abs(currentValue).toString(16).padStart(6, '0').slice9(0, 6);
+    const hex = Math.abs(currentValue).toString(16).padStart(6, '0').slice(0, 6);
     return `#${hex}`.toUpperCase();
   };
 
@@ -55,7 +55,7 @@ const Game = () => {
     };
 
     useEffect(() => {
-      const timer = level <= 10 && timeleft > 0 && setInterval(() => {
+      const timer = level <= 10 && timeLeft > 0 && setInterval(() => {
         setTimeLeft(timeLeft - 1);
       }, 1000);
 
@@ -72,50 +72,69 @@ const Game = () => {
       setWheels([0, 0, 0, 0]);
     };
 
-  };
-
   return (
-    <div className="App">
-      <h1>Pascaline Calculator</h1>
-
-      <div className='switches'>
-        <label>
-          <input 
-            type="checkbox"
-            checked={autoCalculate}
-            onChange={(e) => setAutoCalculate(e.target.checked)}
-          />
-          Auto-Calculation
-        </label>
+    <div className="game-container">
+      {/* header */}
+      <div className='game-header'>
+        <h2>level {level}/10</h2>
+      <div className="multiplier-badge">
+        Multiplier: {multiplier.toFixed(1)}x
+      </div>
+      <div className='timer'>{timeLeft}s remaining</div>
       </div>
 
-      <div className="wheels">
-        {wheels.map((value, index) => (
-          <div key={index}className='wheel'>
-            <button onClick={() => updateWheel(index, 1)}>+</button>
-            <span>{value}</span>
-            <button onClick={() => updateWheel(index, -1)}>-</button>
+      {/* Color Comparison Area */}
+      <div className='color-comparison'>
+        <div className='target-color' style={{ backgroundColor: targetColor }}>
+          <span>TARGET</span>
+        </div>
+        <div className='player-color' style={{ backgroundColor: currentHex() }}>
+          <span>YOUR COLOR</span>
+          <div className='hex-value'>{currentHex()}</div>
+        </div>
+      </div>
+
+      <div className='pascaline-interface'>
+        <div className='wheels'>
+          {wheels.map((value, index) => (
+            <div key={index} className='wheel'>
+              <button onClick={() => updateWheel(index, 1)}>▲</button>
+              <div className='wheel-value'>{value}</div>
+              <button onClick={() => updateWheel(index, -1)}>▼</button>
+            </div>
+          ))}
+        </div>
+
+        <div className='game-controls'>
+          <button className='compare-button' onClick={handleCompare}>
+            COMPARE
+          </button>
+          <button className='skip-button' onClick={handleLevelEnd}>
+            SKIP LEVEL
+          </button>
+        </div>
+      </div>
+
+      {/* Guesses History */}
+      <div className='guess-history'>
+        <h3>Previous Guesses:</h3>
+        {guesses.map((guess, index) => (
+          <div key={index} className='guess-item'>
+            <div className='color-swatch' 
+                 style={{ backgroundColor: guess.hex }}/>
+            <div className='guess-details'>
+              <div>{guess.hex}</div>
+              <div>{guess.accuracy}% match</div>
+            </div>
           </div>
         ))}
-      </div>
-
-      <div className='display'>
-        Decimal: {accumulator}
-      </div>
-
-      <div className='color-preview' style={{ backgroundColor: `#${hexValue}` }}>
-        Hex: #{hexValue}
-      </div>
-
-      <div className='operations'>
-        <button onClick={() => performOperation('add')}>+</button>
-        <button onClick={() => performOperation('subtract')}>-</button>
-        <button onClick={() => performOperation('multiply')}>x</button>
-        <button onClick={() => performOperation('divide')}>÷</button>
-        <button onClick={resetMachine}>Reset</button>
       </div>
     </div>
   );
 };
-const base = 10; // Base for the calculator
-export default App;
+
+function generateRandomColor() {
+  return `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+}
+
+export default Game;

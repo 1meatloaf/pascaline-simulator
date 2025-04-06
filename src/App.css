@@ -10,7 +10,7 @@
   transition: opacity 0.5s ease;
 }
 
-.wheel {
+/* .wheel {
   margin: 0 10px;
   transition: transform 0.5s;
 }
@@ -18,7 +18,7 @@
 .wheel:active {
   transform: scale(0.1);
   border: 2px solid #007bff;
-}
+} */
 
 .color-preview {
   width: 200px;

@@ -1,67 +1,78 @@
-import React, { useState } from 'react';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import './Game.css';
 
-const App = () => {
-  const [accumulator, setAccumulator] = useState(0);
+const Game = () => {
+  const [targetColor, setTargetColor] = useState(generateRandomColor());
+  const [currentValue, setCurrentValue] = useState(0);
   const [wheels, setWheels] = useState([0, 0, 0, 0]);
-  const [autoCalculate, setAutoCalculate] = useState(false);
+  const [guesses, setGuesses] = useState([]); 
+  const [multiplier, setMultiplier] = useState(3.0);
+  const [timeleft, setTimeLeft] = useState(180);
+  const [level, setLevel] = useState(1);
 
+
+  const currentHex  = () => {
+    const hex = Math.abs(currentValue).toString(16).padStart(6, '0').slice9(0, 6);
+    return `#${hex}`.toUpperCase();
+  };
 
   const updateWheel = (index, delta) => {
     const newWheels = [...wheels];
-    newWheels[index] = (newWheels[index] + delta + 10) % base;
+    newWheels[index] = (newWheels[index] + delta + 10) % 10;
     setWheels(newWheels);
  
 
-    if (autoCalculate) {
-      const currentNumber = newWheels.reduce(
-        (acc, val, idx) => acc + val * Math.pow(10, 3 - idx), 
-        0
-      );
-      setAccumulator(currentNumber);
-    }
+    const value = newWheels.reduce((acc, val, idx) => 
+      acc + val * Math.pow(10, 3 - idx), 0);
+    setCurrentValue(value);
   };
+  
+  const calculateAccuracy = (guessHex) => {
+    const extractRGB = hex => 
+      hex.match(/\w\w/g).map(x => parseInt(x, 16));
+    
+    const [tr, tg, tb] = extractRGB(targetColor);
+    const [gr, gg, gb] = extractRGB(guessHex);
 
-  const performOperation = (operation) => {
-    const currentNumber = wheels.reduce(
-      (acc, val, idx) => acc + val * Math.pow(10, 3 - idx), 
-      0
+    const distance = Math.sqrt(
+      Math.pow(tr - gr, 2) +
+      Math.pow(tg - gg, 2) +
+      Math.pow(tb - gb, 2)
     );
-    let result = accumulator;
 
-    switch (operation) {
-      case 'add':
-        result += currentNumber;
-        break;
-      case 'subtract':
-        result -= currentNumber;
-        break;
-      case 'multiply':
-        result *= currentNumber;
-        break;
-      case 'divide':
-        if (currentNumber !== 0) {
-          result /= currentNumber;
-        } else {
-          alert("Cannot divide by zero!");
-          return;
-        }
-        break;
-      default:
-        break;
-    }
+  return Math.max(0,100 - (distance / 441.67 * 100)).toFixed(1);
+    };
 
-    setAccumulator(result);
-    setWheels([0, 0, 0, 0]);
+    const handleCompare = () => {
+      const accuracy = calculateAccuracy(currentHex());
+      setGuesses([...guesses, {
+        hex: currentHex(),
+        accuracy,
+        value: currentValue
+      }]);
+
+      setMultiplier(prev => prev > 0 ? Math.max(0, prev - 0.1) : -0.5);
+    };
+
+    useEffect(() => {
+      const timer = level <= 10 && timeleft > 0 && setInterval(() => {
+        setTimeLeft(timeLeft - 1);
+      }, 1000);
+
+      if(timeLeft === 0) handleLevelEnd();
+      return () => clearInterval(timer);
+    }, [timeLeft]);
+
+    const handleLevelEnd = () => {
+      setLevel(level + 1);
+      setTimeLeft(180);
+      setTargetColor(generateRandomColor());
+      setGuesses([]); 
+      setMultiplier(3.0);
+      setWheels([0, 0, 0, 0]);
+    };
+
   };
-
-  // Reset Calculator
-  const resetMachine = () => {
-    setWheels([0, 0, 0, 0]);
-    setAccumulator(0);
-  };
-
-  const hexValue = Math.abs(accumulator).toString(16).padStart(6, '0').slice(0, 6);
 
   return (
     <div className="App">

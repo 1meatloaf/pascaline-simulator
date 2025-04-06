@@ -1,44 +1,32 @@
-import React, { useActionState, useState } from 'react';
-import Wheel from './components/Wheel';
-import Display from './components/Display';
-import ModeSwitch from './components/ModeSwitch';
-import ColorPreview from './components/ColorPreview';
-import OperationsPanel from './components/OperationsPanel';
+import React, { useState } from 'react';
 import './App.css';
 
 const App = () => {
-  const [mode, setMode] = useState('decimal');
   const [accumulator, setAccumulator] = useState(0);
   const [wheels, setWheels] = useState([0, 0, 0, 0]);
-  const [activeWheel, setActiveWheel] = useState(null);
   const [autoCalculate, setAutoCalculate] = useState(false);
-  const [isResetting, setIsResetting] = useState(false);
 
-  const toggleMode = () => {
-    setMode((prevMode) => (prevMode === 'decimal' ? 'hex' : 'decimal'));
-    setAccumulator(0);
-    setWheels([0, 0, 0, 0]);
-  };
-
-  const toggleAutoCalculate = () => {
-    setAutoCalculate((prev) => !prev);
-  };
 
   const updateWheel = (index, delta) => {
     const newWheels = [...wheels];
-    const base = mode === 'decimal' ? 10 : 16;
-    newWheels[index] = (newWheels[index] + delta + base) % base;
+    newWheels[index] = (newWheels[index] + delta + 10) % base;
     setWheels(newWheels);
-    setActiveWheel(index);
+ 
 
     if (autoCalculate) {
-      const currentNumber = newWheels.reduce((acc, val, idx) => acc + val * Math.pow(base, newWheels.length - idx - 1), 0);
+      const currentNumber = newWheels.reduce(
+        (acc, val, idx) => acc + val * Math.pow(10, 3 - idx), 
+        0
+      );
       setAccumulator(currentNumber);
     }
   };
 
   const performOperation = (operation) => {
-    const currentNumber = wheels.reduce((acc, val, idx) => acc + val * Math.pow(mode === 'decimal' ? 10 : 16, wheels.length - idx - 1), 0);
+    const currentNumber = wheels.reduce(
+      (acc, val, idx) => acc + val * Math.pow(10, 3 - idx), 
+      0
+    );
     let result = accumulator;
 
     switch (operation) {
@@ -67,41 +55,56 @@ const App = () => {
     setWheels([0, 0, 0, 0]);
   };
 
+  // Reset Calculator
   const resetMachine = () => {
-    setIsResetting(true);
-    const maxValue = mode === 'decimal' ? 9 :15;
-    setWheels([maxValue, maxValue, maxValue, maxValue]);;
-
-    // const wheelsElements = document.querySelector('.wheels');
-    // wheelsElements.classlist.add('reseting');
-
-  setTimeout(() => {
     setWheels([0, 0, 0, 0]);
     setAccumulator(0);
-    setIsResetting(false);
-  }, 500);
+  };
 
-};
+  const hexValue = Math.abs(accumulator).toString(16).padStart(6, '0').slice(0, 6);
 
   return (
     <div className="App">
       <h1>Pascaline Calculator</h1>
-      <ModeSwitch mode={mode} toggleMode={toggleMode} autoCalculate={autoCalculate} toggleAutoCalculate={toggleAutoCalculate}/>
-      <div className="wheels ${isResetting ? 'resetting' : ''}">
-        {wheels.map((value, index) => (
-          <Wheel
-            key={index}
-            value={value}
-            onChange={(delta) => updateWheel(index, delta)}
-            isActive={activeWheel === index}
+
+      <div className='switches'>
+        <label>
+          <input 
+            type="checkbox"
+            checked={autoCalculate}
+            onChange={(e) => setAutoCalculate(e.target.checked)}
           />
+          Auto-Calculation
+        </label>
+      </div>
+
+      <div className="wheels">
+        {wheels.map((value, index) => (
+          <div key={index}className='wheel'>
+            <button onClick={() => updateWheel(index, 1)}>+</button>
+            <span>{value}</span>
+            <button onClick={() => updateWheel(index, -1)}>-</button>
+          </div>
         ))}
       </div>
-      <Display value={accumulator} mode={mode} />
-      <OperationsPanel onOperation={performOperation} onReset={resetMachine}/>
-      {mode === 'hex' && <ColorPreview hexValue={accumulator.toString(16).padStart(6, '0')} />}
+
+      <div className='display'>
+        Decimal: {accumulator}
+      </div>
+
+      <div className='color-preview' style={{ backgroundColor: `#${hexValue}` }}>
+        Hex: #{hexValue}
+      </div>
+
+      <div className='operations'>
+        <button onClick={() => performOperation('add')}>+</button>
+        <button onClick={() => performOperation('subtract')}>-</button>
+        <button onClick={() => performOperation('multiply')}>x</button>
+        <button onClick={() => performOperation('divide')}>÷</button>
+        <button onClick={resetMachine}>Reset</button>
+      </div>
     </div>
   );
 };
-
+const base = 10; // Base for the calculator
 export default App;

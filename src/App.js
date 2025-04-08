@@ -33,11 +33,12 @@ const Game = () => {
     const value = newWheels.reduce((acc, val, idx) => 
       acc + val * Math.pow(10, 3 - idx), 0);
     setCurrentValue(value);
+    setShowPreview(false);
   };
   
   const calculateAccuracy = (guessHex) => {
     const extractRGB = hex => 
-      hex.match(/\w\w/g).map(x => parseInt(x, 16));
+      hex.replace('#','').match(/\w{2}/g).map(x => parseInt(x, 16));
     
     const [tr, tg, tb] = extractRGB(targetColor);
     const [gr, gg, gb] = extractRGB(guessHex);
@@ -53,11 +54,12 @@ const Game = () => {
 
     const handleCompare = () => {
       const accuracy = calculateAccuracy(currentHex());
-      setGuesses([...guesses, {
+      const newGuess = {
         hex: currentHex(),
         accuracy,
-        value: currentValue
-      }]);
+        value: currentValue,
+        timestamp: Date.now()
+      };
 
       setMultiplier(prev => prev > 0 ? Math.max(0, prev - 0.1) : -0.5);
     };

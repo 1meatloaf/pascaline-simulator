@@ -108,7 +108,7 @@ const Game = () => {
 
     if (level >= 10) {
       localStorage.setItem('colorPuzzleHistory',
-        JSON.stringify([...gameHistory, {score, date: new Data()}])
+        JSON.stringify([...gameHistory, {score, date: new Date()}])
       );
       setGameEnded(true);
       return;
@@ -129,14 +129,16 @@ const Game = () => {
     }, [timeLeft]);
 
     if(gameEnded) return <EndScreen score={score} bestGuesses={bestGuesses} />;
+
   return (
     <div className="game-container">
       {/* header */}
       <div className='game-header'>
         <h2>level {level}/10</h2>
-      <div className="multiplier-badge">
+      <div className={`multiplier ${multiplier <= 0 ? 'negatif' : ''}`}>
         Multiplier: {multiplier.toFixed(1)}x
       </div>
+      <div className='score'>Score: {score}</div>
       <div className='timer'>{timeLeft}s remaining</div>
       </div>
 
@@ -145,20 +147,22 @@ const Game = () => {
         <div className='target-color' style={{ backgroundColor: targetColor }}>
           <span>TARGET</span>
         </div>
-        <div className='player-color' style={{ backgroundColor: currentHex() }}>
+        <div className='player-color' 
+        style={{ backgroundColor: showPreview ? currentHex() : 'transparent'}}>
           <span>YOUR COLOR</span>
-          <div className='hex-value'>{currentHex()}</div>
+          <div className='hex-value'>{showPreview && currentHex()}</div>
         </div>
       </div>
 
       <div className='pascaline-interface'>
         <div className='wheels'>
           {wheels.map((value, index) => (
-            <div key={index} className='wheel'>
-              <button onClick={() => updateWheel(index, 1)}>▲</button>
-              <div className='wheel-value'>{value}</div>
-              <button onClick={() => updateWheel(index, -1)}>▼</button>
-            </div>
+            <Wheel 
+              key={index} 
+              value={value}
+              onIncrement={() => updateWheel(index, 1)}
+              onDecrement={() => updateWheel(index, -1)}
+            />
           ))}
         </div>
 
@@ -166,32 +170,107 @@ const Game = () => {
           <button className='compare-button' onClick={handleCompare}>
             COMPARE
           </button>
-          <button className='skip-button' onClick={handleLevelEnd}>
+          <button className='skip-button' onClick={() => handleLevelEnd()}>
             SKIP LEVEL
           </button>
         </div>
       </div>
 
-      {/* Guesses History */}
+      <div className='hint-container'>
+        {hint && <div className='hint'>💡 hint: {hint}</div>}
+      </div>
+
+      <GuessHistory
+        guesses={guesses}
+        bestGuesses={bestGuesses}
+        onSelect={guess => {
+          setCurrentValue(guess.value);
+          setShowPreview(true);
+        }}
+      /> 
+    </div>
+    );
+  };
+
+  const Wheel = ({ value, onIncrement, onDecrement}) => (
+    <div className='wheel'>
+      <button onClick={onIncrement}>▲</button>
+      <div className='wheel-value'>{value}</div>
+      <button onClick={onDecrement}>▼</button>
+    </div>
+  );
+
+  const GuessHistory = ({ guesses, bestGuesses, onSelect }) => {
+    const bestAccuracy = guesses.length > 0 ? Math.max(...guesses.map(g => g.accuracy)) : 0;
+
+    return (
       <div className='guess-history'>
         <h3>Previous Guesses:</h3>
-        {guesses.map((guess, index) => (
-          <div key={index} className='guess-item'>
-            <div className='color-swatch' 
-                 style={{ backgroundColor: guess.hex }}/>
-            <div className='guess-details'>
-              <div>{guess.hex}</div>
-              <div>{guess.accuracy}% match</div>
-            </div>
+            {guesses.map((guess, index) => (
+              <div 
+                key={index} 
+                className={`guess-item ${guess.accuracy == bestAccuracy ? 'best-guess' : ''}`}
+                onClick={() => onSelect(guess)}
+              >
+                <div className='color-swatch' style={{ backgroundColor: guess.hex }}/>
+                <div className='guess-details'>
+                  <div className='hex-code'>{guess.hex}</div>
+                  <div className='accuracy-bar'>
+                    <div
+                      className='bar-fill' 
+                      style={{
+                        width: `${guess.accuracy}%`,
+                        backgroundColor: getAccuracyColor(guess.accuracy)
+                      }}
+                    >
+                      <span className='accuracy-text'>{guess.accuracy}%</span>
+                    </div>
+                  </div>
+                      {guess.auto && <div className='auto-tag'>AUTO</div>}
+                </div>
+              </div>
+            ))}
+        </div>
+    );
+  };
+
+
+
+  const EndScreen = ({ score, bestGuesses }) => (
+    <div className='end-screen'>
+      <h2>Game Complete! 🎉</h2>
+      <div className='total-score'>Final Score: {score}</div>
+
+      <div className='heatmap'>
+        {bestGuesses.map((guess, index) => (
+          <div 
+            key={index}
+            className='heatmap-item'
+            style={{
+              backgroundColor: guess.hex,
+              opacity: guess.accuracy / 100
+            }}>
+              <span>L{index + 1}</span>
           </div>
         ))}
       </div>
+
+      <button
+        className='play-again'
+        onClick={() => window.location.reload()}>
+          Play Again
+        </button>
     </div>
   );
-};
 
 function generateRandomColor() {
   return `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+}
+
+function getAccuracyColor(accuracy) {
+  if(accuracy >= 70) return '#4CAF50';
+  if(accuracy >= 30) return '#FF9800';
+  return '#F44336';
 }
 
 export default Game;

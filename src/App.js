@@ -129,6 +129,38 @@ const Game = () => {
     setHint('');
   };
 
+  const handleOperation = (op) => {
+    setStoredValue(currentValue);
+    setOperation(op);
+    setWheels([0, 0, 0, 0]);
+    setCurrentValue(0);
+  };
+
+  const handleCalculate = () => {
+    if(!operation || storedValue === null) return;
+
+    let result;
+    switch(operation) {
+      case '+':
+        result = storedValue + currentValue;
+        break;
+      case '-':
+        result = storedValue - currentValue;
+        break;
+      case '*':
+        result = storedValue * currentValue;
+          break;
+      case '/':
+        result = storedValue / currentValue || 0; break;
+          break;      
+          default: return;
+    }
+
+    setCurrentValue(result);
+    setOperation(null);
+    setStoredValue(null);
+  };
+
     useEffect(() => {
       if(timeLeft === 0) handleLevelEnd(true);
     }, [timeLeft]);

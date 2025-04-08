@@ -101,18 +101,34 @@ const Game = () => {
         }];
       }
 
-      
-    };
+      const bestGuess = finalGuesses.reduce((best, curr) => 
+      curr.accuracy > best.accuracy ? curr : best 
+    ); 
+    setBestGuesses(prev => [...prev, bestGuess]);
+
+    if (level >= 10) {
+      localStorage.setItem('colorPuzzleHistory',
+        JSON.stringify([...gameHistory, {score, date: new Data()}])
+      );
+      setGameEnded(true);
+      return;
+    }
+
+    setLevel(prev => prev + 1);
+    setTimeLeft(45);
+    setTargetColor(generateRandomColor());
+    setGuesses([]);
+    setMultiplier(1.0);
+    setWheels([0, 0, 0, 0]);
+    setShowPreview(false);
+    setHint('');
+  };
 
     useEffect(() => {
-      const timer = level <= 10 && timeLeft > 0 && setInterval(() => {
-        setTimeLeft(timeLeft - 1);
-      }, 1000);
+      if(timeLeft === 0) handleLevelEnd(true);
+    }, [timeLeft]);
 
-      if(timeLeft === 0) handleLevelEnd();
-      return () => clearInterval(timer);
-    }, [timeLeft]); 
-
+    if(gameEnded) return <EndScreen score={score} bestGuesses={bestGuesses} />;
   return (
     <div className="game-container">
       {/* header */}

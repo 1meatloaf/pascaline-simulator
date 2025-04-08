@@ -109,6 +109,8 @@ const Game = () => {
   const handleLevelEnd = (auto = false) => {
     let finalGuesses = [...guesses];
 
+    setWheels([0, 0, 0, 0, 0, 0]);
+
     if (auto && guesses.length === 0) {
       const accuracy = calculateAccuracy(currentHex());
       finalGuesses = [
@@ -152,7 +154,7 @@ const Game = () => {
     const validOp = op === '×' ? '*' : op === '÷' ? '/' : op;
     setStoredValue(currentValue);
     setOperation(validOp);
-    setWheels([0, 0, 0, 0]);
+    setWheels([0, 0, 0, 0, 0, 0]);
     setCurrentValue(0);
   };
 
@@ -178,8 +180,8 @@ const Game = () => {
     }
 
     result = ((result % 0x1000000) + 0x1000000) % 0x1000000;
-    setCurrentValue(result);
 
+    setCurrentValue(result);
     const newWheels = [];
     let val = result;
     for (let i=5; i>=0; i--) {
@@ -284,6 +286,7 @@ const Game = () => {
       <GuessHistory
         guesses={guesses}
         bestGuesses={bestGuesses}
+        setWheels={setWheels}
         onSelect={(guess) => {
           setCurrentValue(guess.value);
           setShowPreview(true);
@@ -293,41 +296,51 @@ const Game = () => {
   );
 };
 
-const Wheel = ({ value, onIncrement, onDecrement }) => (
+const Wheel = ({ value }) => (
   <div className="wheel">
-    <button onClick={onIncrement}>▲</button>
     <div className="wheel-value">{value}</div>
-    <button onClick={onDecrement}>▼</button>
   </div>
 );
-
-const GuessHistory = ({ guesses, bestGuesses, onSelect }) => {
+const GuessHistory = ({ guesses, bestGuesses, setWheels, onSelect }) => {
   const bestAccuracy =
     guesses.length > 0
-      ? Math.max(...guesses.map((g) => g.accuracy))
+      ? Math.max(...guesses.map((g) => parseFloat(g.accuracy)))
       : 0;
 
-  return (
-    <div className="guess-history">
-      <h3>Previous Guesses:</h3>
-      {guesses.map((guess, index) => (
-        <div
-          key={index}
-          className={`guess-item ${
-            guess.accuracy === bestAccuracy ? 'best-guess' : ''
-          }`}
-          onClick={() => onSelect(guess)}
-        >
-          <div
-            className="color-swatch"
-            style={{ backgroundColor: guess.hex }}
-            title={`${guess.hex}`}
-          />
+      return (
+        <div className="guess-history">
+          <h3>Previous Guesses ({guesses.length}):</h3>
+          <div className="guess-list">
+            {guesses.map((guess, index) => (
+              <div
+                key={index}
+                className={`guess-item ${
+                  parseFloat(guess.accuracy) === bestAccuracy ? 'best-guess' : ''
+                }`}
+                onClick={() => {
+                  onSelect(guess);
+                  const newWheels = [];
+                  let val = guess.value;
+                  for (let i = 5; i >= 0; i--) {
+                    const divisor = Math.pow(10, i);
+                    newWheels.unshift(Math.floor(val / divisor) % 10);
+                    val %= divisor;
+                  }
+                  setWheels(newWheels);
+                }}
+              >
+                <div
+                  className="color-swatch"
+                  style={{ backgroundColor: guess.hex }}
+                  title={`${guess.hex} (${guess.accuracy}%)`}
+                />
+                <span className="accuracy-badge">{guess.accuracy}%</span>
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
-    </div>
-  );
-};
+      );
+    };
 
 const EndScreen = ({ score, bestGuesses, totalTime }) => {
   const formatTime = (seconds) => {
@@ -338,10 +351,10 @@ const EndScreen = ({ score, bestGuesses, totalTime }) => {
 
   return (
     <div className="end-screen">
-      <h2>Game Complete! 🎉</h2>
+      <h2>Game Complete!</h2>
       <div className="stats">
         <div>⏱ Total Time: {formatTime(totalTime)}</div>
-        <div>🏆 Total Score: {score}</div>
+        <div> Total Score: {score}</div>
       </div>
 
       <div className="accuracy-breakdown">

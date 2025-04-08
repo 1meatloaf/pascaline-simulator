@@ -14,6 +14,10 @@ const Game = () => {
   const [hint, setHint] = useState('');
   const [gameEnded, setGameEnded] = useState(false);
   const [bestGuesses, setBestGuesses] = useState([]);
+  const [totalTime, setTotalTime] = useState(0);
+  const [startTime, setStartTime] = useState(Date.now());
+  const [storedValue, setStoredValue] = useState(0);
+  const [operation, setOperation] = useState(null);
 
   const [gameHistory,setGameHistory] = useState(
     JSON.parse(localStorage.getItem('gameHistory')) || []

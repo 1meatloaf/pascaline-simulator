@@ -16,10 +16,10 @@ function getAccuracyColor(accuracy) {
 const Game = () => {
   const [targetColor, setTargetColor] = useState(generateRandomColor());
   const [currentValue, setCurrentValue] = useState(0);
-  const [wheels, setWheels] = useState([0, 0, 0, 0]);
+  const [wheels, setWheels] = useState([0, 0, 0, 0, 0, 0]);
   const [guesses, setGuesses] = useState([]);
   const [multiplier, setMultiplier] = useState(1.0);
-  const [timeLeft, setTimeLeft] = useState(45);
+  const [timeLeft, setTimeLeft] = useState(30);
   const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
@@ -29,19 +29,16 @@ const Game = () => {
   const [totalTime, setTotalTime] = useState(0);
   const [startTime, setStartTime] = useState(Date.now());
   const [storedValue, setStoredValue] = useState(0);
-  const [operation, setOperation] = useState(null);
+  const [operation, setOperation] = useState(null);   
 
   const [gameHistory, setGameHistory] = useState(
     JSON.parse(localStorage.getItem('gameHistory')) || []
   );
 
   const currentHex = () => {
-    const hex = Math.abs(currentValue)
-      .toString(16)
-      .padStart(6, '0')
-      .slice(0, 6);
-    return `#${hex}`.toUpperCase();
-  };
+    const value = Math.abs((currentValue % 0x1000000) + 0x1000000) % 0x1000000;
+    return `#${value.toString(16).padStart(6, '0')  .slice(0,6).toUpperCase()}`;
+  };  
 
   const updateWheel = (index, delta) => {
     const newWheels = [...wheels];
@@ -49,7 +46,7 @@ const Game = () => {
     setWheels(newWheels);
 
     const value = newWheels.reduce(
-      (acc, val, idx) => acc + val * Math.pow(10, 3 - idx),
+      (acc, val, idx) => acc + val * Math.pow(10, 5 - idx),
       0
     );
     setCurrentValue(value);
@@ -100,10 +97,8 @@ const Game = () => {
 
   const getHint = (difference, attemptCount) => {
     if (multiplier > 0.4) return 'Keep trying';
-
-    const targetNum = parseInt(targetColor.replace('#', ''), 16);
+    const targetStr = targetColor.replace('#', '').toLowerCase().padStart(6, '0');
     const revealedDigits = Math.min(6, Math.floor((0.4 - multiplier) * 10));
-    const targetStr = targetNum.toString().padStart(6, '0');
 
     return `Target starts with: ${targetStr.slice(
       0,
@@ -135,13 +130,12 @@ const Game = () => {
     if (level >= 10) {
       setTotalTime(Math.floor((Date.now() - startTime) / 1000));
       localStorage.setItem(
-        'colorPuzzleHistory',
+        'gameHistory',
         JSON.stringify([...gameHistory, { score, date: new Date() }])
       );
       setGameEnded(true);
       return;
     }
-
 
     setLevel((prev) => prev + 1);
     setTimeLeft(30);
@@ -177,13 +171,24 @@ const Game = () => {
         result = storedValue * currentValue;
         break;
       case '/':
-        result = currentValue !== 0 ? storedValue / currentValue : 0;
+        result = currentValue !== 0 ? Math.trunc(storedValue / currentValue) : 0;
         break;
       default:
         return;
     }
 
+    result = ((result % 0x1000000) + 0x1000000) % 0x1000000;
     setCurrentValue(result);
+
+    const newWheels = [];
+    let val = result;
+    for (let i=5; i>=0; i--) {
+      const divisor = Math.pow(10, i);
+      newWheels.unshift(Math.floor(val / divisor) % 10);
+      val %= divisor;
+    }
+    setWheels(newWheels); 
+
     setOperation(null);
     setStoredValue(null);
   };

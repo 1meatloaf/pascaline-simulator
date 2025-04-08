@@ -6,10 +6,18 @@ const Game = () => {
   const [currentValue, setCurrentValue] = useState(0);
   const [wheels, setWheels] = useState([0, 0, 0, 0]);
   const [guesses, setGuesses] = useState([]); 
-  const [multiplier, setMultiplier] = useState(3.0);
-  const [timeLeft, setTimeLeft] = useState(180);
+  const [multiplier, setMultiplier] = useState(1.0);
+  const [timeLeft, setTimeLeft] = useState(45);
   const [level, setLevel] = useState(1);
+  const [score, setScore] = useState(0);
+  const [showPreview, setShowPreview] = useState(false);
+  const [hint, setHint] = useState('');
+  const [gameEnded, setGameEnded] = useState(false);
+  const [bestGuesses, setBestGuesses] = useState([]);
 
+  const [gameHistory,setGameHistory] = useState(
+    JSON.parse(localStorage.getItem('gameHistory')) || []
+  );
 
   const currentHex  = () => {
     const hex = Math.abs(currentValue).toString(16).padStart(6, '0').slice(0, 6);
@@ -65,7 +73,7 @@ const Game = () => {
 
     const handleLevelEnd = () => {
       setLevel(level + 1);
-      setTimeLeft(180);
+      setTimeLeft(45);
       setTargetColor(generateRandomColor());
       setGuesses([]); 
       setMultiplier(3.0);

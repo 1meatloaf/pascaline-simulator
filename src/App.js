@@ -162,8 +162,14 @@ const Game = () => {
   };
 
     useEffect(() => {
-      if(timeLeft === 0) handleLevelEnd(true);
-    }, [timeLeft]);
+      let timer;
+      if(!gameEnded && timeLeft > 0) {
+        timer = setInterval(() => {
+          setTimeLeft(prev => prev - 1);
+        }, 1000);
+      } 
+      return () => clearInterval(timer);
+    }, [timeLeft, gameEnded]);
 
     if(gameEnded) return <EndScreen score={score} bestGuesses={bestGuesses} />;
 

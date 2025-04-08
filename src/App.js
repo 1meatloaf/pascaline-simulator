@@ -61,7 +61,30 @@ const Game = () => {
         timestamp: Date.now()
       };
 
+      const points = Math.round(100 * (accuracy/100) * multiplier);
+      setScore(prev => Math.max(0, prev + points));
+
+      setGuesses([...guesses, newGuess]);
       setMultiplier(prev => prev > 0 ? Math.max(0, prev - 0.1) : -0.5);
+      setShowPreview(true);
+
+      if(accuracy < 70 ) {
+        const difference = parseInt(targetColor.replace('#',''), 16) - currentValue;
+        setHint(getHint(difference, guesses.length));
+      }
+    };
+
+    const getHint = (difference, attemptCount) => {
+      const absDiff = Math.abs(difference);
+      const direction = difference > 0 ? 'higher' : 'lower';
+
+      const hints = [
+        { attempts: 3, text: `Try a ${direction} value`},
+        { attempts: 5, text: `Focus on ${absDiff > 65535 ? 'red' : absDiff > 255 ? 'green' : 'blue'} chanell`},
+        { attempts: 7, text: `Adjust by ~${Math.round(absDiff/1000)} k`}
+      ]
+
+      return hints.find(h => attemptCount >= h.attempts)?.text || '';
     };
 
     useEffect(() => {

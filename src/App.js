@@ -111,6 +111,7 @@ const Game = () => {
     setBestGuesses(prev => [...prev, bestGuess]);
 
     if (level >= 10) {
+      setTotalTime(Math.floor((Date.now() - startTime) / 1000 ));
       localStorage.setItem('colorPuzzleHistory',
         JSON.stringify([...gameHistory, {score, date: new Date()}])
       );
@@ -119,7 +120,7 @@ const Game = () => {
     }
 
     setLevel(prev => prev + 1);
-    setTimeLeft(45);
+    setTimeLeft(30);
     setTargetColor(generateRandomColor());
     setGuesses([]);
     setMultiplier(1.0);

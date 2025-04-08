@@ -82,9 +82,26 @@ const Game = () => {
         { attempts: 3, text: `Try a ${direction} value`},
         { attempts: 5, text: `Focus on ${absDiff > 65535 ? 'red' : absDiff > 255 ? 'green' : 'blue'} chanell`},
         { attempts: 7, text: `Adjust by ~${Math.round(absDiff/1000)} k`}
-      ]
+      ];
 
       return hints.find(h => attemptCount >= h.attempts)?.text || '';
+    };
+
+    const handleLevelEnd = ( auto = false ) => {
+      let finalGuesses = [...guesses];
+
+      if(auto && guesses.length === 0) {
+        const accuracy = calculateAccuracy(currentHex());
+        finalGuesses =[{
+          hex: currentHex(),
+          accuracy,
+          value: currentValue,
+          timestamp: Date.now(),
+          auto: true
+        }];
+      }
+
+      
     };
 
     useEffect(() => {
@@ -94,16 +111,7 @@ const Game = () => {
 
       if(timeLeft === 0) handleLevelEnd();
       return () => clearInterval(timer);
-    }, [timeLeft]);
-
-    const handleLevelEnd = () => {
-      setLevel(level + 1);
-      setTimeLeft(45);
-      setTargetColor(generateRandomColor());
-      setGuesses([]); 
-      setMultiplier(3.0);
-      setWheels([0, 0, 0, 0]);
-    };
+    }, [timeLeft]); 
 
   return (
     <div className="game-container">

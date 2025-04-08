@@ -142,7 +142,7 @@ const Game = () => {
       return;
     }
 
-    // Advance to the next level:
+
     setLevel((prev) => prev + 1);
     setTimeLeft(30);
     setTargetColor(generateRandomColor());
@@ -154,7 +154,7 @@ const Game = () => {
   };
 
   const handleOperation = (op) => {
-    // Map onscreen operators to standard JS arithmetic
+  
     const validOp = op === '×' ? '*' : op === '÷' ? '/' : op;
     setStoredValue(currentValue);
     setOperation(validOp);

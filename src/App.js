@@ -124,6 +124,18 @@ const Game = () => {
     setWheels([0, 0, 0, 0, 0, 0]);
     setShowPreview(false);
     setHint('');
+    setNotification('');
+  };
+
+  const resetLevel = () => {
+    setTimeLeft(45);
+    setTargetColor(generateRandomColor());
+    setGuesses([]);
+    setMultiplier(1.0);
+    setWheels([0, 0, 0, 0, 0, 0]);
+    setShowPreview(false);
+    setHint('');
+    setNotification('');
   };
 
   const handleOperation = (op) => {
@@ -135,6 +147,9 @@ const Game = () => {
   const handleEquals = () => {
     if (operation === '/' && currentValue === 0) {
       setNotification('Invalid: Division by zero is not allowed!');
+      return;
+    }
+
       let result;
       switch (operation) {
         case '+':
@@ -162,7 +177,6 @@ const Game = () => {
       setWheels(newWheels);
       setOperation(null);
       setOperand(null);
-    }
   };
 
   const toggleSign = () => {
@@ -255,6 +269,9 @@ const Game = () => {
           </button>
           <button className='skip-button' onClick={() => handleLevelEnd()}>
             SKIP LEVEL
+          </button>
+          <button className='skip-button' onClick={() => resetLevel()}>
+            RESET LEVEL
           </button>
           <div className='calculator-controls'>
             <button onClick={() => handleOperation('+')}>+</button>

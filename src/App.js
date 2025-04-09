@@ -29,22 +29,11 @@ const Game = () => {
     return `#${hex}`.toUpperCase();
   };
 
-  const updateDecimalWheel = (index, delta) => {
-    const newDecimalWheels = [...decimalWheels];
-    const base = 10;
-    newDecimalWheels[index] = (newDecimalWheels[index] + delta + base) % base;
-    setDecimalWheels(newDecimalWheels);
 
-    const value = newDecimalWheels.reduce((acc, val, idx) => 
-      acc + val * Math.pow(base, decimalWheels.length - idx - 1),
-      0
-  );
-  setDecimalValue(value);
- };
 
   const updateWheel = (index, delta) => {
     const newWheels = [...wheels];
-    newWheels[index] = (newWheels[index] + delta + 10) % 16;
+    newWheels[index] = (newWheels[index] + delta + 16) % 16;
     setWheels(newWheels);
  
 
@@ -158,18 +147,25 @@ const Game = () => {
           result = operand * currentValue;
           break;  
         case '/':
-          result = operand / currentValue;
+          result = currentValue !== 0 ? operand / currentValue : 0;
           break;
         default:
           return;
       }
 
       setCurrentValue(result);
-      setWheels(result.toString(16).padStart(6, '0').split('').map((char) => 
+      setWheels(Math.abs(result).toString(16).padStart(6, '0').split('').map((char) => 
         parseInt(char, 16)));
       setOperation(null);
       setOperand(null);
     }
+  };
+
+  const toggleSign = () => {
+    setCurrentValue((prev) => -prev);
+    setWheels(Math.abs(currentValue).toString(16).padStart(6, '0').split('').map((char) =>
+      parseInt(char, 16))
+   ); 
   };
 
     useEffect(() => {
@@ -209,9 +205,10 @@ const Game = () => {
         <div className='player-color' 
         style={{ backgroundColor: showPreview ? currentHex() : 'transparent'}}>
           <span style={{ color: '#94a3b8'}}>-</span>
-          <div className='hex-value'>{showPreview && currentHex()}</div>
-          <div className='decimal-value'>Decimal: {decimalValue}</div>
+          
+          
         </div>
+        <div className='hex-value'>Hexadecimal: {currentValue < 0 ? '-' : ''}{showPreview && currentHex()}</div>
       </div>
 
       <div className='reps-hex'>
@@ -240,19 +237,7 @@ const Game = () => {
           ))}
         </div>
 
-        <div className='decimal-wheels'>
-            <h3 style={{ textAlign: 'center'}}>Decimal Wheels</h3>
-            <div className='wheels'>
-              {decimalWheels.map((value, index) => (
-                <Wheel
-                  key={`decimal-${index}`}
-                  value={value}
-                  onIncrement={() => updateDecimalWheel(index, 1)}
-                  onDecrement={() => updateDecimalWheel(index, -1)}
-                  />
-              ))}
-            </div>
-          </div>
+
 
         <div className='game-controls'>
           <button className='compare-button' onClick={handleCompare}>
@@ -267,6 +252,8 @@ const Game = () => {
             <button onClick={() => handleOperation('*')}>*</button>
             <button onClick={() => handleOperation('/')}>/</button>
             <button onClick={handleEquals}>=</button>
+            <button onClick={toggleSign}>+/-</button>
+            
           </div>
         </div>
       </div>

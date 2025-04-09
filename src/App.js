@@ -7,13 +7,15 @@ const Game = () => {
   const [wheels, setWheels] = useState([0, 0, 0, 0, 0, 0]);
   const [guesses, setGuesses] = useState([]); 
   const [multiplier, setMultiplier] = useState(1.0);
-  const [timeLeft, setTimeLeft] = useState(5);
+  const [timeLeft, setTimeLeft] = useState(45);
   const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
   const [hint, setHint] = useState('');
   const [gameEnded, setGameEnded] = useState(false);
   const [bestGuesses, setBestGuesses] = useState([]);
+  const [operation, setOperation] = useState(null);
+  const [operand, setOperand] = useState(null);
 
   const [gameHistory,setGameHistory] = useState(
     JSON.parse(localStorage.getItem('gameHistory')) || []
@@ -111,7 +113,7 @@ const Game = () => {
     }
 
     setLevel((prev) => prev + 1);
-    setTimeLeft(5);
+    setTimeLeft(45);
     setTargetColor(generateRandomColor());
     setGuesses([]);
     setMultiplier(1.0);
@@ -120,7 +122,39 @@ const Game = () => {
     setHint('');
   };
 
-  
+  const handleOperation = (op) => {
+    setOperand(currentValue);
+    setOperation(op);
+    setWheels([0, 0, 0, 0, 0, 0]);
+  };
+
+  const handleEquals = () => {
+    if (operation && operand !== null) {
+      let result;
+      switch (operation) {
+        case '+':
+          result = operand + currentValue;
+          break;
+        case '-':
+          result = operand - currentValue;
+          break;
+        case '*':
+          result = operand * currentValue;
+          break;  
+        case '/':
+          result = operand / currentValue;
+          break;
+        default:
+          return;
+      }
+
+      setCurrentValue(result);
+      setWheels(result.toString(16).padStart(6, '0').split('').map((char) => 
+        parseInt(char, 16)));
+      setOperation(null);
+      setOperand(null);
+    }
+  };
 
     useEffect(() => {
       let timer;
@@ -151,12 +185,14 @@ const Game = () => {
 
       {/* Color Comparison Area */}
       <div className='color-comparison'>
+      <span>TARGET:</span>
         <div className='target-color' style={{ backgroundColor: targetColor }}>
-          <span>TARGET</span>
+          <span style={{ color: '#94a3b8'}}>-</span>
         </div>
+        <span>YOUR COLOR:</span>
         <div className='player-color' 
         style={{ backgroundColor: showPreview ? currentHex() : 'transparent'}}>
-          <span>YOUR COLOR</span>
+          <span style={{ color: '#94a3b8'}}>-</span>
           <div className='hex-value'>{showPreview && currentHex()}</div>
         </div>
       </div>
@@ -193,6 +229,13 @@ const Game = () => {
           <button className='skip-button' onClick={() => handleLevelEnd()}>
             SKIP LEVEL
           </button>
+          <div className='calculator-controls'>
+            <button onClick={() => handleOperation('+')}>+</button>
+            <button onClick={() => handleOperation('-')}>-</button>
+            <button onClick={() => handleOperation('*')}>*</button>
+            <button onClick={() => handleOperation('/')}>/</button>
+            <button onClick={handleEquals}>=</button>
+          </div>
         </div>
       </div>
 
@@ -213,7 +256,9 @@ const Game = () => {
   };
 
   const Wheel = ({ value, onIncrement, onDecrement}) => (
+    
     <div className='wheel'>
+      <p className='des-text'>HEX</p>
       <button onClick={onIncrement}>▲</button>
       <div className='wheel-value'>{value}</div>
       <button onClick={onDecrement}>▼</button>

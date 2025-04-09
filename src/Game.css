@@ -29,6 +29,13 @@ button {
   font-size: 1em;
 }
 
+.notification {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+  text-align: center;
+}
+
 /* .game-controls {
   display: grid;
   position: absolute;

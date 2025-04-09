@@ -18,6 +18,7 @@ const Game = () => {
   const [bestGuesses, setBestGuesses] = useState([]);
   const [operation, setOperation] = useState(null);
   const [operand, setOperand] = useState(null);
+  const [notification, setNotification] = useState('');
   
 
   const [gameHistory,setGameHistory] = useState(
@@ -28,8 +29,6 @@ const Game = () => {
     const hex = Math.abs(currentValue).toString(16).padStart(6, '0').slice(0, 6);
     return `#${hex}`.toUpperCase();
   };
-
-
 
   const updateWheel = (index, delta) => {
     const newWheels = [...wheels];
@@ -134,7 +133,8 @@ const Game = () => {
   };
 
   const handleEquals = () => {
-    if (operation && operand !== null) {
+    if (operation === '/' && currentValue === 0) {
+      setNotification('Invalid: Division by zero is not allowed!');
       let result;
       switch (operation) {
         case '+':
@@ -147,25 +147,34 @@ const Game = () => {
           result = operand * currentValue;
           break;  
         case '/':
-          result = currentValue !== 0 ? operand / currentValue : 0;
+          result = currentValue !== 0 ? Math.trunc(operand / currentValue) : 0;
           break;
         default:
           return;
       }
 
-      setCurrentValue(result);
-      setWheels(Math.abs(result).toString(16).padStart(6, '0').split('').map((char) => 
-        parseInt(char, 16)));
+      const clampedResult = result % 0x1000000;
+      const absValue = Math.abs(clampedResult);
+      const hexStr = absValue.toString(16).padStart(6, '0').slice(-6);
+      const newWheels = hexStr.split('').map((char) => parseInt(char, 16));
+
+      setCurrentValue(clampedResult);
+      setWheels(newWheels);
       setOperation(null);
       setOperand(null);
     }
   };
 
   const toggleSign = () => {
-    setCurrentValue((prev) => -prev);
-    setWheels(Math.abs(currentValue).toString(16).padStart(6, '0').split('').map((char) =>
-      parseInt(char, 16))
-   ); 
+    setCurrentValue((prev) => {
+      const newValue = -prev;
+      const clampedValue = newValue % 0x1000000;
+      const absValue = Math.abs(clampedValue);
+      const hexStr = absValue.toString(16).padStart(6, '0').slice(-6);
+      const newWheels = hexStr.split('').map((char) => parseInt(char, 16));
+      setWheels(newWheels);
+      return clampedValue;
+  }); 
   };
 
     useEffect(() => {
@@ -224,6 +233,7 @@ const Game = () => {
         </tr>
       </div>
 
+      {notification && <div className='notification'>{notification}</div>}
       <div className='pascaline-interface'>
       <h3 style={{ textAlign: 'center'}}>Hex Wheels</h3>
         <div className='wheels'>

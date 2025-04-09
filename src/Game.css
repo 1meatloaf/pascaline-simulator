@@ -10,16 +10,6 @@
   transition: opacity 0.5s ease;
 }
 
-/* .wheel {
-  margin: 0 10px;
-  transition: transform 0.5s;
-}
-
-.wheel:active {
-  transform: scale(0.1);
-  border: 2px solid #007bff;
-} */
-
 .color-preview {
   width: 200px;
   height: 100px;
@@ -38,3 +28,12 @@ button {
   padding: 10px;
   font-size: 1em;
 }
+
+/* .game-controls {
+  display: grid;
+  position: absolute;
+  bottom: -145px;
+  left: 0%;
+  transform: translateX(-0%);
+} */
+

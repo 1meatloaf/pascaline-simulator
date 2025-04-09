@@ -5,6 +5,8 @@ const Game = () => {
   const [targetColor, setTargetColor] = useState(generateRandomColor());
   const [currentValue, setCurrentValue] = useState(0);
   const [wheels, setWheels] = useState([0, 0, 0, 0, 0, 0]);
+  const [decimalWheels, setDecimalWheels] = useState([0, 0, 0, 0, 0, 0]);
+  const [decimalValue, setDecimalValue] = useState(0);
   const [guesses, setGuesses] = useState([]); 
   const [multiplier, setMultiplier] = useState(1.0);
   const [timeLeft, setTimeLeft] = useState(45);
@@ -16,6 +18,7 @@ const Game = () => {
   const [bestGuesses, setBestGuesses] = useState([]);
   const [operation, setOperation] = useState(null);
   const [operand, setOperand] = useState(null);
+  
 
   const [gameHistory,setGameHistory] = useState(
     JSON.parse(localStorage.getItem('gameHistory')) || []
@@ -26,9 +29,22 @@ const Game = () => {
     return `#${hex}`.toUpperCase();
   };
 
+  const updateDecimalWheel = (index, delta) => {
+    const newDecimalWheels = [...decimalWheels];
+    const base = 10;
+    newDecimalWheels[index] = (newDecimalWheels[index] + delta + base) % base;
+    setDecimalWheels(newDecimalWheels);
+
+    const value = newDecimalWheels.reduce((acc, val, idx) => 
+      acc + val * Math.pow(base, decimalWheels.length - idx - 1),
+      0
+  );
+  setDecimalValue(value);
+ };
+
   const updateWheel = (index, delta) => {
     const newWheels = [...wheels];
-    newWheels[index] = (newWheels[index] + delta + 16) % 16;
+    newWheels[index] = (newWheels[index] + delta + 10) % 16;
     setWheels(newWheels);
  
 
@@ -194,6 +210,7 @@ const Game = () => {
         style={{ backgroundColor: showPreview ? currentHex() : 'transparent'}}>
           <span style={{ color: '#94a3b8'}}>-</span>
           <div className='hex-value'>{showPreview && currentHex()}</div>
+          <div className='decimal-value'>Decimal: {decimalValue}</div>
         </div>
       </div>
 
@@ -211,6 +228,7 @@ const Game = () => {
       </div>
 
       <div className='pascaline-interface'>
+      <h3 style={{ textAlign: 'center'}}>Hex Wheels</h3>
         <div className='wheels'>
           {wheels.map((value, index) => (
             <Wheel 
@@ -221,6 +239,20 @@ const Game = () => {
             />
           ))}
         </div>
+
+        <div className='decimal-wheels'>
+            <h3 style={{ textAlign: 'center'}}>Decimal Wheels</h3>
+            <div className='wheels'>
+              {decimalWheels.map((value, index) => (
+                <Wheel
+                  key={`decimal-${index}`}
+                  value={value}
+                  onIncrement={() => updateDecimalWheel(index, 1)}
+                  onDecrement={() => updateDecimalWheel(index, -1)}
+                  />
+              ))}
+            </div>
+          </div>
 
         <div className='game-controls'>
           <button className='compare-button' onClick={handleCompare}>
@@ -258,7 +290,7 @@ const Game = () => {
   const Wheel = ({ value, onIncrement, onDecrement}) => (
     
     <div className='wheel'>
-      <p className='des-text'>HEX</p>
+      
       <button onClick={onIncrement}>▲</button>
       <div className='wheel-value'>{value}</div>
       <button onClick={onDecrement}>▼</button>

@@ -7,7 +7,7 @@ const Game = () => {
   const [wheels, setWheels] = useState([0, 0, 0, 0, 0, 0]);
   const [guesses, setGuesses] = useState([]); 
   const [multiplier, setMultiplier] = useState(1.0);
-  const [timeLeft, setTimeLeft] = useState(45);
+  const [timeLeft, setTimeLeft] = useState(5);
   const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
@@ -92,25 +92,26 @@ const Game = () => {
           accuracy,
           value: currentValue,
           timestamp: Date.now(),
-          auto: true
+          auto: true,
         }];
       }
 
       const bestGuess = finalGuesses.reduce((best, curr) => 
-      curr.accuracy > best.accuracy ? curr : best 
-    ); 
+      (curr.accuracy > best.accuracy ? curr : best),
+      { accuracy: 0}
+);
     setBestGuesses(prev => [...prev, bestGuess]);
 
     if (level >= 10) {
-      localStorage.setItem('colorPuzzleHistory',
+      localStorage.setItem('gameHistory',
         JSON.stringify([...gameHistory, {score, date: new Date()}])
       );
       setGameEnded(true);
       return;
     }
 
-    setLevel(prev => prev + 1);
-    setTimeLeft(45);
+    setLevel((prev) => prev + 1);
+    setTimeLeft(5);
     setTargetColor(generateRandomColor());
     setGuesses([]);
     setMultiplier(1.0);
@@ -122,8 +123,17 @@ const Game = () => {
   
 
     useEffect(() => {
-      if(timeLeft === 0) handleLevelEnd(true);
-    }, [timeLeft]);
+      let timer;
+
+      if(!gameEnded && timeLeft > 0 ){
+        timer = setInterval(() => {
+          setTimeLeft((prev) => prev - 1);
+        }, 1000);
+      } else if (timeLeft === 0) {
+        handleLevelEnd(true)
+      }
+      return () => clearInterval(timer);
+    }, [timeLeft, gameEnded]);
 
     if(gameEnded) return <EndScreen score={score} bestGuesses={bestGuesses} />;
 
@@ -152,14 +162,15 @@ const Game = () => {
       </div>
 
       <div className='reps-hex'>
-        <tr>
-          <td>0-9: These represent the values zero through nine</td>
-          <td>A: Represents the value 10.</td>
-          <td>B: Represents the value 11.</td>
-          <td>C: Represents the value 12.</td>
-          <td>D: Represents the value 13.</td>
-          <td>E: Represents the value 14.</td>
-          <td>F: Represents the value 15.</td>
+        <br></br>
+        <tr style={{ textAlign: 'center'}}>
+          <tr style={{ textAlign: 'left', verticalAlign: "middle" }}>0-9: These represent the values zero through nine</tr>
+          <tr style={{ textAlign: 'left', verticalAlign: "middle" }}>A: Represents the value 10.</tr>
+          <tr style={{ textAlign: 'left', verticalAlign: "middle" }}>B: Represents the value 11.</tr>
+          <tr style={{ textAlign: 'left', verticalAlign: "middle" }}>C: Represents the value 12.</tr>
+          <tr style={{ textAlign: 'left', verticalAlign: "middle" }}>D: Represents the value 13.</tr>
+          <tr style={{ textAlign: 'left', verticalAlign: "middle" }}>E: Represents the value 14.</tr>
+          <tr style={{ textAlign: 'left', verticalAlign: "middle" }}>F: Represents the value 15.</tr>
         </tr>
       </div>
 

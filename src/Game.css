@@ -29,6 +29,21 @@ button {
   font-size: 1em;
 }
 
+/* .reset-button {
+  margin: 5px;
+  padding: 10px;
+  font-size: 1em;
+  background-color: #f0ad4e;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.reset-button:hover {
+  background-color: #ec971f;
+} */
+
 .notification {
   color: red;
   font-weight: bold;
@@ -44,3 +59,34 @@ button {
   transform: translateX(-0%);
 } */
 
+.history-screen {
+  padding: 20px;
+  text-align: center;
+}
+
+.history-entry {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 15px;
+  margin: 10px 0;
+}
+
+.history-score {
+  font-size: 1.2em;
+  margin-bottom: 5px;
+}
+
+.history-data {
+  color: #94a3b8;
+  font-size: 0.9em;
+}
+
+.view-history-button {
+  background-color: #3b82F6;
+  margin: 10px;
+}
+
+.play-again {
+  background-color: #ea8c4e;
+  margin: 10px;
+}

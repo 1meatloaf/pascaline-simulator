@@ -5,8 +5,6 @@ const Game = () => {
   const [targetColor, setTargetColor] = useState(generateRandomColor());
   const [currentValue, setCurrentValue] = useState(0);
   const [wheels, setWheels] = useState([0, 0, 0, 0, 0, 0]);
-  const [decimalWheels, setDecimalWheels] = useState([0, 0, 0, 0, 0, 0]);
-  const [decimalValue, setDecimalValue] = useState(0);
   const [guesses, setGuesses] = useState([]); 
   const [multiplier, setMultiplier] = useState(1.0);
   const [timeLeft, setTimeLeft] = useState(45);
@@ -88,12 +86,12 @@ const Game = () => {
         return `Target starts with ${targetSrt.slice(0, revealedDigits)}${'_'.repeat(6 - revealedDigits)}`;
     };
 
-    const handleLevelEnd = ( auto = false ) => {
+    const handleLevelEnd = (auto = false) => {
       let finalGuesses = [...guesses];
-
-      if(auto && guesses.length === 0) {
+    
+      if (auto && guesses.length === 0) {
         const accuracy = calculateAccuracy(currentHex());
-        finalGuesses =[{
+        finalGuesses = [{
           hex: currentHex(),
           accuracy,
           value: currentValue,
@@ -101,16 +99,18 @@ const Game = () => {
           auto: true,
         }];
       }
-
+    
       const bestGuess = finalGuesses.reduce((best, curr) => 
-      (curr.accuracy > best.accuracy ? curr : best),
-      { accuracy: 0}
-);
+        (curr.accuracy > best.accuracy ? curr : best),
+        { accuracy: 0 }
+      );
     setBestGuesses(prev => [...prev, bestGuess]);
 
     if (level >= 10) {
       localStorage.setItem('gameHistory',
-        JSON.stringify([...gameHistory, {score, date: new Date()}])
+        JSON.stringify([...gameHistory, {score, date: new Date(), bestGuesses}, 
+          bestGuesses
+        ])
       );
       setGameEnded(true);
       return;
@@ -204,7 +204,7 @@ const Game = () => {
       return () => clearInterval(timer);
     }, [timeLeft, gameEnded]);
 
-    if(gameEnded) return <EndScreen score={score} bestGuesses={bestGuesses} />;
+    if(gameEnded) return <EndScreen score={score} bestGuesses={bestGuesses} gameHistory={gameHistory}/>;
 
   return (
     <div className="game-container">
@@ -261,8 +261,6 @@ const Game = () => {
           ))}
         </div>
 
-
-
         <div className='game-controls'>
           <button className='compare-button' onClick={handleCompare}>
             COMPARE
@@ -270,7 +268,7 @@ const Game = () => {
           <button className='skip-button' onClick={() => handleLevelEnd()}>
             SKIP LEVEL
           </button>
-          <button className='skip-button' onClick={() => resetLevel()}>
+          <button className='reset-button' onClick={() => resetLevel()}>
             RESET LEVEL
           </button>
           <div className='calculator-controls'>
@@ -346,33 +344,67 @@ const Game = () => {
   };
 
 
-
-  const EndScreen = ({ score, bestGuesses }) => (
-    <div className='end-screen'>
-      <h2>Game Complete!</h2>
-      <div className='total-score'>Final Score: {score}</div>
-
-      <div className='heatmap'>
-        {bestGuesses.map((guess, index) => (
-          <div 
-            key={index}
-            className='heatmap-item'
-            style={{
-              backgroundColor: guess.hex,
-              opacity: guess.accuracy / 100
-            }}>
-              <span>L{index + 1}</span>
+  const HistoryScreen = ({ gameHistory }) => (
+      <div className='history-screen'>
+        <h2>Game History</h2>
+        {gameHistory?.length > 0 ? (
+        gameHistory.map((game, index) => (
+          <div key={index} className='history-entry'>
+            <div className='history-score'>Score: {game.score}</div>
+            <div className='history-date'>Date: {new Date(game.date).toLocaleString()}</div>
+            <div className='heatmap'>
+              {game.bestGuesses?.map((guess, idx) => (
+                <div key={idx} className='heatmap-item'
+                style={{ backgroundColor: guess.hex, opacity: guess.accuracy / 100,
+                }}>
+              <span>L{idx + 1}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
+        ))
+      ) : (
+        <p>Game history empty.</p>
+      )}
       </div>
+  );
 
-      <button
-        className='play-again'
-        onClick={() => window.location.reload()}>
-          Play Again
-        </button>
+  const EndScreen = ({ score, bestGuesses, gameHistory }) => {
+    const [showHistory, setShowHistory] = useState(false);
+  return (
+    <div className='end-screen'>
+      {!showHistory ? (
+        <>
+          <h2>Game Complete!</h2>
+          <div className='total-score'>Final Score: {score}</div>
+          <div className='heatmap'>
+            {bestGuesses?.map((guess, index) => (
+              <div 
+                key={index} className='heatmap-item'
+                style={{
+                  backgroundColor: guess.hex, opacity: guess.accuracy / 100
+                }}>
+                  <span>L{index + 1}</span>
+              </div>
+            ))}
+          </div>
+          <button 
+            className='view-history-button'
+            onClick={() => setShowHistory(true)}>
+              View History
+          </button>
+          <button
+            className='play-again'
+            onClick={() => window.location.reload()}>
+              Play Again
+          </button>
+        </>
+      ) : (
+        <HistoryScreen gameHistory={gameHistory} />
+      )}
     </div>
   );
+};
 
 function generateRandomColor() {
   return `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;

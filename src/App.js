@@ -1,6 +1,8 @@
+/* library yang id include*/
 import React, { useState, useEffect } from 'react';
 import './Game.css';
 
+// komponen utama game
 const Game = () => {
   const [targetColor, setTargetColor] = useState(generateRandomColor());
   const [currentValue, setCurrentValue] = useState(0);
@@ -23,11 +25,15 @@ const Game = () => {
     JSON.parse(localStorage.getItem('gameHistory')) || []
   );
 
+  
+
+  // untuk mengubah nilai numeric ke warna hexa
   const currentHex  = () => {
     const hex = Math.abs(currentValue).toString(16).padStart(6, '0').slice(0, 6);
     return `#${hex}`.toUpperCase();
   };
 
+  // mengatur nilai angka
   const updateWheel = (index, delta) => {
     const newWheels = [...wheels];
     newWheels[index] = (newWheels[index] + delta + 16) % 16;
@@ -40,6 +46,7 @@ const Game = () => {
     setShowPreview(false);
   };
   
+  // untuk menghitung akurasi tebakan
   const calculateAccuracy = (guessHex) => {
     const extractRGB = hex => 
       hex.replace('#','').match(/\w{2}/g).map(x => parseInt(x, 16));
@@ -56,6 +63,7 @@ const Game = () => {
   return Math.max(0,100 - (distance / 441.67 * 100)).toFixed(1);
     };
 
+    // untuk membandingkan warna target dan pengguna  
     const handleCompare = () => {
       const accuracy = calculateAccuracy(currentHex());
       const newGuess = {
@@ -78,6 +86,7 @@ const Game = () => {
       }
     };
 
+    // untuk memberikan hint ke pengguna
     const getHint = (difference, attemptCount) => {
         if (multiplier > 0.7) return 'keep Trying';
         const targetSrt = targetColor.replace('#','').toLowerCase().padStart(6, '0');
@@ -86,6 +95,7 @@ const Game = () => {
         return `Target starts with ${targetSrt.slice(0, revealedDigits)}${'_'.repeat(6 - revealedDigits)}`;
     };
 
+    // untuk mengakhiri level
     const handleLevelEnd = (auto = false) => {
       let finalGuesses = [...guesses];
     
@@ -127,6 +137,7 @@ const Game = () => {
     setNotification('');
   };
 
+  // ini untuk mereset level
   const resetLevel = () => {
     setTimeLeft(45);
     setTargetColor(generateRandomColor());
@@ -138,12 +149,14 @@ const Game = () => {
     setNotification('');
   };
 
+  // ini untuk nyimpen operasi mtk
   const handleOperation = (op) => {
     setOperand(currentValue);
     setOperation(op);
     setWheels([0, 0, 0, 0, 0, 0]);
   };
 
+  // ini untuk ngelakuin operasi mtk
   const handleEquals = () => {
     if (operation === '/' && currentValue === 0) {
       setNotification('Invalid: Division by zero is not allowed!');
@@ -179,6 +192,7 @@ const Game = () => {
       setOperand(null);
   };
 
+  // ini untuk mengubah tanda nilai (-/+)
   const toggleSign = () => {
     setCurrentValue((prev) => {
       const newValue = -prev;
@@ -191,6 +205,7 @@ const Game = () => {
   }); 
   };
 
+  // yang ini untuk mengatur timer
     useEffect(() => {
       let timer;
 
@@ -299,6 +314,7 @@ const Game = () => {
     );
   };
 
+  // komponen roda untuk mengubah nilai
   const Wheel = ({ value, onIncrement, onDecrement}) => (
     
     <div className='wheel'>
@@ -309,6 +325,7 @@ const Game = () => {
     </div>
   );
 
+  // riwayat daftar tebakan sebelumnya
   const GuessHistory = ({ guesses, bestGuesses, onSelect }) => {
     const bestAccuracy = guesses.length > 0 ? Math.max(...guesses.map(g => g.accuracy)) : 0;
 
@@ -344,6 +361,7 @@ const Game = () => {
   };
 
 
+  // histori akhir permainan
   const HistoryScreen = ({ gameHistory }) => (
       <div className='history-screen'>
         <h2>Game History</h2>
@@ -352,6 +370,7 @@ const Game = () => {
           <div key={index} className='history-entry'>
             <div className='history-score'>Score: {game.score}</div>
             <div className='history-date'>Date: {new Date(game.date).toLocaleString()}</div>
+            
             <div className='heatmap'>
               {game.bestGuesses?.map((guess, idx) => (
                 <div key={idx} className='heatmap-item'
@@ -366,9 +385,16 @@ const Game = () => {
       ) : (
         <p>Game history empty.</p>
       )}
+            <button
+            className='play-again'
+            onClick={() => window.location.reload()}>
+              Play Again
+          </button>
       </div>
+      
   );
 
+  // layar akhir yang menampilkan hasil permainan
   const EndScreen = ({ score, bestGuesses, gameHistory }) => {
     const [showHistory, setShowHistory] = useState(false);
   return (
@@ -406,10 +432,12 @@ const Game = () => {
   );
 };
 
+// ini untuk menampilkan warna acak
 function generateRandomColor() {
   return `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
 }
 
+// ngasih warna berdasarkan akurasi
 function getAccuracyColor(accuracy) {
   if(accuracy >= 70) return '#4CAF50';
   if(accuracy >= 30) return '#FF9800';

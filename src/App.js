@@ -286,13 +286,13 @@ const Game = () => {
           <button className='reset-button' onClick={() => resetLevel()}>
             RESET LEVEL
           </button>
-          <div className='calculator-controls'>
-            <button onClick={() => handleOperation('+')}>+</button>
-            <button onClick={() => handleOperation('-')}>-</button>
-            <button onClick={() => handleOperation('*')}>*</button>
-            <button onClick={() => handleOperation('/')}>/</button>
-            <button onClick={handleEquals}>=</button>
-            <button onClick={toggleSign}>+/-</button>
+          <div className='calculator-controls' style={{ verticalAlign: 'middle'}}>
+            <button className='b-plus' onClick={() => handleOperation('+')}>+</button>
+            <button className='b-minus' onClick={() => handleOperation('-')}>-</button>
+            <button className='b-multiply' onClick={() => handleOperation('*')}>*</button>
+            <button className='b-divide' onClick={() => handleOperation('/')}>/</button>
+            <button className='b-equals' onClick={handleEquals}>=</button>
+            <button className='b-plus-minus' onClick={toggleSign}>+/-</button>
             
           </div>
         </div>
@@ -319,9 +319,9 @@ const Game = () => {
     
     <div className='wheel'>
       
-      <button onClick={onIncrement}>▲</button>
+      <button style={{ backgroundColor: 'darkseagreen'}} onClick={onIncrement}>▲</button>
       <div className='wheel-value'>{value}</div>
-      <button onClick={onDecrement}>▼</button>
+      <button style={{ backgroundColor: 'darkseagreen'}} onClick={onDecrement}>▼</button>
     </div>
   );
 
